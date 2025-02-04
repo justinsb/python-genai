@@ -19,8 +19,8 @@ import os
 import PIL.Image
 from pydantic import BaseModel, ValidationError
 import pytest
+import json
 
-from ... import _transformers as t
 from ... import errors
 from ... import types
 from .. import pytest_helper
@@ -137,6 +137,17 @@ def test_uploaded_file_uri(client):
             ),
         ],
     )
+
+
+def test_config_override(client):
+  chat_config = {'candidate_count': 1}
+  chat = client.chats.create(model='gemini-1.5-flash', config=chat_config)
+  request_config = {'candidate_count': 2}
+  response = chat.send_message(
+      'tell me a story in 100 words',
+      config=request_config)
+
+  assert len(response.candidates) == 2
 
 
 def test_history(client):
@@ -403,6 +414,19 @@ def test_stream_parts(client):
     chunks += 1
 
   assert chunks > 2
+
+
+def test_stream_config_override(client):
+  chat_config = {'response_mime_type': 'text/plain'}
+  chat = client.chats.create(model='gemini-1.5-flash', config=chat_config)
+  request_config = {'response_mime_type': 'application/json'}
+  text = ''
+  for chunk in chat.send_message_stream(
+      'tell me a story in 100 words',
+      config=request_config):
+    text += chunk.text
+
+  assert json.loads(text)
 
 
 def test_stream_function_calling(client):
