@@ -29,13 +29,13 @@ different services ([Gemini Developer API](https://ai.google.dev/gemini-api/docs
 
 ```python
 # Only run this block for Gemini Developer API
-client = genai.Client(api_key="GEMINI_API_KEY")
+client = genai.Client(api_key='GEMINI_API_KEY')
 ```
 
 ```python
 # Only run this block for Vertex AI API
 client = genai.Client(
-    vertexai=True, project="your-project-id", location="us-central1"
+    vertexai=True, project='your-project-id', location='us-central1'
 )
 ```
 
@@ -55,7 +55,7 @@ The `client.models` modules exposes model inferencing and model getters.
 
 ```python
 response = client.models.generate_content(
-    model="gemini-2.0-flash-exp", contents="why is the sky blue?"
+    model='gemini-2.0-flash-exp', contents='why is the sky blue?'
 )
 print(response.text)
 ```
@@ -70,10 +70,10 @@ download the file in console.
 python code.
 
 ```python
-file = client.files.upload(path="a11.txt")
+file = client.files.upload(path='a11.txt')
 response = client.models.generate_content(
-    model="gemini-2.0-flash-exp",
-    contents=["Could you summarize this file?", file]
+    model='gemini-2.0-flash-exp',
+    contents=['Could you summarize this file?', file]
 )
 print(response.text)
 ```
@@ -82,10 +82,10 @@ print(response.text)
 
 ```python
 response = client.models.generate_content(
-    model="gemini-2.0-flash-exp",
-    contents="high",
+    model='gemini-2.0-flash-exp',
+    contents='high',
     config=types.GenerateContentConfig(
-        system_instruction="I say high, you say low",
+        system_instruction='I say high, you say low',
         temperature=0.3,
     ),
 )
@@ -99,8 +99,8 @@ dictionaries. You can get the type from `google.genai.types`.
 
 ```python
 response = client.models.generate_content(
-    model="gemini-2.0-flash-exp",
-    contents=types.Part.from_text(text="Why is the sky blue?"),
+    model='gemini-2.0-flash-exp',
+    contents=types.Part.from_text(text='Why is the sky blue?'),
     config=types.GenerateContentConfig(
         temperature=0,
         top_p=0.95,
@@ -108,7 +108,7 @@ response = client.models.generate_content(
         candidate_count=1,
         seed=5,
         max_output_tokens=100,
-        stop_sequences=["STOP!"],
+        stop_sequences=['STOP!'],
         presence_penalty=0.0,
         frequency_penalty=0.0,
     ),
@@ -127,7 +127,7 @@ for model in client.models.list():
 ```
 
 ```python
-pager = client.models.list(config={"page_size": 10})
+pager = client.models.list(config={'page_size': 10})
 print(pager.page_size)
 print(pager[0])
 pager.next_page()
@@ -142,7 +142,7 @@ async for job in await client.aio.models.list():
 ```
 
 ```python
-async_pager = await client.aio.models.list(config={"page_size": 10})
+async_pager = await client.aio.models.list(config={'page_size': 10})
 print(async_pager.page_size)
 print(async_pager[0])
 await async_pager.next_page()
@@ -153,13 +153,13 @@ print(async_pager[0])
 
 ```python
 response = client.models.generate_content(
-    model="gemini-2.0-flash-exp",
-    contents="Say something bad.",
+    model='gemini-2.0-flash-exp',
+    contents='Say something bad.',
     config=types.GenerateContentConfig(
         safety_settings=[
             types.SafetySetting(
-                category="HARM_CATEGORY_HATE_SPEECH",
-                threshold="BLOCK_ONLY_HIGH",
+                category='HARM_CATEGORY_HATE_SPEECH',
+                threshold='BLOCK_ONLY_HIGH',
             )
         ]
     ),
@@ -181,12 +181,12 @@ def get_current_weather(location: str) -> str:
     Args:
       location: The city and state, e.g. San Francisco, CA
     """
-    return "sunny"
+    return 'sunny'
 
 
 response = client.models.generate_content(
-    model="gemini-2.0-flash-exp",
-    contents="What is the weather like in Boston?",
+    model='gemini-2.0-flash-exp',
+    contents='What is the weather like in Boston?',
     config=types.GenerateContentConfig(tools=[get_current_weather]),
 )
 
@@ -203,25 +203,25 @@ Then you will receive a function call part in the response.
 
 ```python
 function = types.FunctionDeclaration(
-    name="get_current_weather",
-    description="Get the current weather in a given location",
+    name='get_current_weather',
+    description='Get the current weather in a given location',
     parameters=types.Schema(
-        type="OBJECT",
+        type='OBJECT',
         properties={
-            "location": types.Schema(
-                type="STRING",
-                description="The city and state, e.g. San Francisco, CA",
+            'location': types.Schema(
+                type='STRING',
+                description='The city and state, e.g. San Francisco, CA',
             ),
         },
-        required=["location"],
+        required=['location'],
     ),
 )
 
 tool = types.Tool(function_declarations=[function])
 
 response = client.models.generate_content(
-    model="gemini-2.0-flash-exp",
-    contents="What is the weather like in Boston?",
+    model='gemini-2.0-flash-exp',
+    contents='What is the weather like in Boston?',
     config=types.GenerateContentConfig(tools=[tool]),
 )
 
@@ -235,8 +235,8 @@ The following example shows how to do it for a simple function invocation.
 
 ```python
 user_prompt_content = types.Content(
-    role="user",
-    parts=[types.Part.from_text(text="What is the weather like in Boston?")],
+    role='user',
+    parts=[types.Part.from_text(text='What is the weather like in Boston?')],
 )
 function_call_part = response.function_calls[0]
 
@@ -245,11 +245,11 @@ try:
     function_result = get_current_weather(
         **function_call_part.function_call.args
     )
-    function_response = {"result": function_result}
+    function_response = {'result': function_result}
 except (
     Exception
 ) as e:  # instead of raising the exception, you can let the model handle it
-    function_response = {"error": str(e)}
+    function_response = {'error': str(e)}
 
 
 function_response_part = types.Part.from_function_response(
@@ -257,11 +257,11 @@ function_response_part = types.Part.from_function_response(
     response=function_response,
 )
 function_response_content = types.Content(
-    role="tool", parts=[function_response_part]
+    role='tool', parts=[function_response_part]
 )
 
 response = client.models.generate_content(
-    model="gemini-2.0-flash-exp",
+    model='gemini-2.0-flash-exp',
     contents=[
         user_prompt_content,
         function_call_content,
@@ -296,10 +296,10 @@ class CountryInfo(BaseModel):
 
 
 response = client.models.generate_content(
-    model="gemini-2.0-flash-exp",
-    contents="Give me information for the United States.",
+    model='gemini-2.0-flash-exp',
+    contents='Give me information for the United States.',
     config=types.GenerateContentConfig(
-        response_mime_type="application/json",
+        response_mime_type='application/json',
         response_schema=CountryInfo,
     ),
 )
@@ -308,30 +308,30 @@ print(response.text)
 
 ```python
 response = client.models.generate_content(
-    model="gemini-2.0-flash-exp",
-    contents="Give me information for the United States.",
+    model='gemini-2.0-flash-exp',
+    contents='Give me information for the United States.',
     config=types.GenerateContentConfig(
-        response_mime_type="application/json",
+        response_mime_type='application/json',
         response_schema={
-            "required": [
-                "name",
-                "population",
-                "capital",
-                "continent",
-                "gdp",
-                "official_language",
-                "total_area_sq_mi",
+            'required': [
+                'name',
+                'population',
+                'capital',
+                'continent',
+                'gdp',
+                'official_language',
+                'total_area_sq_mi',
             ],
-            "properties": {
-                "name": {"type": "STRING"},
-                "population": {"type": "INTEGER"},
-                "capital": {"type": "STRING"},
-                "continent": {"type": "STRING"},
-                "gdp": {"type": "INTEGER"},
-                "official_language": {"type": "STRING"},
-                "total_area_sq_mi": {"type": "INTEGER"},
+            'properties': {
+                'name': {'type': 'STRING'},
+                'population': {'type': 'INTEGER'},
+                'capital': {'type': 'STRING'},
+                'continent': {'type': 'STRING'},
+                'gdp': {'type': 'INTEGER'},
+                'official_language': {'type': 'STRING'},
+                'total_area_sq_mi': {'type': 'INTEGER'},
             },
-            "type": "OBJECT",
+            'type': 'OBJECT',
         },
     ),
 )
@@ -395,9 +395,9 @@ print(response.text)
 
 ```python
 for chunk in client.models.generate_content_stream(
-    model="gemini-2.0-flash-exp", contents="Tell me a story in 300 words."
+    model='gemini-2.0-flash-exp', contents='Tell me a story in 300 words.'
 ):
-    print(chunk.text, end="")
+    print(chunk.text, end='')
 ```
 
 #### Streaming for image content
@@ -407,35 +407,35 @@ you can use the `from_uri` class method to create a `Part` object.
 
 ```python
 for chunk in client.models.generate_content_stream(
-    model="gemini-2.0-flash-exp",
+    model='gemini-2.0-flash-exp',
     contents=[
-        "What is this image about?",
+        'What is this image about?',
         types.Part.from_uri(
-            file_uri="gs://generativeai-downloads/images/scones.jpg",
-            mime_type="image/jpeg",
+            file_uri='gs://generativeai-downloads/images/scones.jpg',
+            mime_type='image/jpeg',
         ),
     ],
 ):
-    print(chunk.text, end="")
+    print(chunk.text, end='')
 ```
 
 If your image is stored in your local file system, you can read it in as bytes
 data and use the `from_bytes` class method to create a `Part` object.
 
 ```python
-YOUR_IMAGE_PATH = "your_image_path"
-YOUR_IMAGE_MIME_TYPE = "your_image_mime_type"
-with open(YOUR_IMAGE_PATH, "rb") as f:
+YOUR_IMAGE_PATH = 'your_image_path'
+YOUR_IMAGE_MIME_TYPE = 'your_image_mime_type'
+with open(YOUR_IMAGE_PATH, 'rb') as f:
     image_bytes = f.read()
 
 for chunk in client.models.generate_content_stream(
-    model="gemini-2.0-flash-exp",
+    model='gemini-2.0-flash-exp',
     contents=[
-        "What is this image about?",
+        'What is this image about?',
         types.Part.from_bytes(data=image_bytes, mime_type=YOUR_IMAGE_MIME_TYPE),
     ],
 ):
-    print(chunk.text, end="")
+    print(chunk.text, end='')
 ```
 
 ### Async
@@ -448,7 +448,7 @@ of `client.models.generate_content`
 
 ```python
 response = await client.aio.models.generate_content(
-    model="gemini-2.0-flash-exp", contents="Tell me a story in 300 words."
+    model='gemini-2.0-flash-exp', contents='Tell me a story in 300 words.'
 )
 
 print(response.text)
@@ -458,17 +458,17 @@ print(response.text)
 
 ```python
 async for chunk in await client.aio.models.generate_content_stream(
-    model="gemini-2.0-flash-exp", contents="Tell me a story in 300 words."
+    model='gemini-2.0-flash-exp', contents='Tell me a story in 300 words.'
 ):
-    print(chunk.text, end="")
+    print(chunk.text, end='')
 ```
 
 ### Count Tokens and Compute Tokens
 
 ```python
 response = client.models.count_tokens(
-    model="gemini-2.0-flash-exp",
-    contents="why is the sky blue?",
+    model='gemini-2.0-flash-exp',
+    contents='why is the sky blue?',
 )
 print(response)
 ```
@@ -479,8 +479,8 @@ Compute tokens is only supported in Vertex AI.
 
 ```python
 response = client.models.compute_tokens(
-    model="gemini-2.0-flash-exp",
-    contents="why is the sky blue?",
+    model='gemini-2.0-flash-exp',
+    contents='why is the sky blue?',
 )
 print(response)
 ```
@@ -489,8 +489,8 @@ print(response)
 
 ```python
 response = await client.aio.models.count_tokens(
-    model="gemini-2.0-flash-exp",
-    contents="why is the sky blue?",
+    model='gemini-2.0-flash-exp',
+    contents='why is the sky blue?',
 )
 print(response)
 ```
@@ -499,8 +499,8 @@ print(response)
 
 ```python
 response = client.models.embed_content(
-    model="text-embedding-004",
-    contents="why is the sky blue?",
+    model='text-embedding-004',
+    contents='why is the sky blue?',
 )
 print(response)
 ```
@@ -508,8 +508,8 @@ print(response)
 ```python
 # multiple contents with config
 response = client.models.embed_content(
-    model="text-embedding-004",
-    contents=["why is the sky blue?", "What is your age?"],
+    model='text-embedding-004',
+    contents=['why is the sky blue?', 'What is your age?'],
     config=types.EmbedContentConfig(output_dimensionality=10),
 )
 
@@ -525,13 +525,13 @@ Support for generate images in Gemini Developer API is behind an allowlist
 ```python
 # Generate Image
 response1 = client.models.generate_images(
-    model="imagen-3.0-generate-002",
-    prompt="An umbrella in the foreground, and a rainy night sky in the background",
+    model='imagen-3.0-generate-002',
+    prompt='An umbrella in the foreground, and a rainy night sky in the background',
     config=types.GenerateImagesConfig(
-        negative_prompt="human",
+        negative_prompt='human',
         number_of_images=1,
         include_rai_reason=True,
-        output_mime_type="image/jpeg",
+        output_mime_type='image/jpeg',
     ),
 )
 response1.generated_images[0].image.show()
@@ -544,12 +544,12 @@ Upscale image is only supported in Vertex AI.
 ```python
 # Upscale the generated image from above
 response2 = client.models.upscale_image(
-    model="imagen-3.0-generate-001",
+    model='imagen-3.0-generate-001',
     image=response1.generated_images[0].image,
-    upscale_factor="x2",
+    upscale_factor='x2',
     config=types.UpscaleImageConfig(
         include_rai_reason=True,
-        output_mime_type="image/jpeg",
+        output_mime_type='image/jpeg',
     ),
 )
 response2.generated_images[0].image.show()
@@ -574,21 +574,21 @@ raw_ref_image = RawReferenceImage(
 mask_ref_image = MaskReferenceImage(
     reference_id=2,
     config=types.MaskReferenceConfig(
-        mask_mode="MASK_MODE_BACKGROUND",
+        mask_mode='MASK_MODE_BACKGROUND',
         mask_dilation=0,
     ),
 )
 
 response3 = client.models.edit_image(
-    model="imagen-3.0-capability-001",
-    prompt="Sunlight and clear sky",
+    model='imagen-3.0-capability-001',
+    prompt='Sunlight and clear sky',
     reference_images=[raw_ref_image, mask_ref_image],
     config=types.EditImageConfig(
-        edit_mode="EDIT_MODE_INPAINT_INSERTION",
+        edit_mode='EDIT_MODE_INPAINT_INSERTION',
         number_of_images=1,
-        negative_prompt="human",
+        negative_prompt='human',
         include_rai_reason=True,
-        output_mime_type="image/jpeg",
+        output_mime_type='image/jpeg',
     ),
 )
 response3.generated_images[0].image.show()
@@ -601,32 +601,32 @@ Create a chat session to start a multi-turn conversations with the model.
 ### Send Message
 
 ```python
-chat = client.chats.create(model="gemini-2.0-flash-exp")
-response = chat.send_message("tell me a story")
+chat = client.chats.create(model='gemini-2.0-flash-exp')
+response = chat.send_message('tell me a story')
 print(response.text)
 ```
 
 ### Streaming
 
 ```python
-chat = client.chats.create(model="gemini-2.0-flash-exp")
-for chunk in chat.send_message_stream("tell me a story"):
+chat = client.chats.create(model='gemini-2.0-flash-exp')
+for chunk in chat.send_message_stream('tell me a story'):
     print(chunk.text)
 ```
 
 ### Async
 
 ```python
-chat = client.aio.chats.create(model="gemini-2.0-flash-exp")
-response = await chat.send_message("tell me a story")
+chat = client.aio.chats.create(model='gemini-2.0-flash-exp')
+response = await chat.send_message('tell me a story')
 print(response.text)
 ```
 
 ### Async Streaming
 
 ```python
-chat = client.aio.chats.create(model="gemini-2.0-flash-exp")
-async for chunk in await chat.send_message_stream("tell me a story"):
+chat = client.aio.chats.create(model='gemini-2.0-flash-exp')
+async for chunk in await chat.send_message_stream('tell me a story'):
     print(chunk.text)
 ```
 
@@ -642,8 +642,8 @@ Files are only supported in Gemini Developer API.
 ### Upload
 
 ```python
-file1 = client.files.upload(path="2312.11805v3.pdf")
-file2 = client.files.upload(path="2403.05530.pdf")
+file1 = client.files.upload(path='2312.11805v3.pdf')
+file2 = client.files.upload(path='2403.05530.pdf')
 
 print(file1)
 print(file2)
@@ -652,7 +652,7 @@ print(file2)
 ### Delete
 
 ```python
-file3 = client.files.upload(path="2312.11805v3.pdf")
+file3 = client.files.upload(path='2312.11805v3.pdf')
 
 client.files.delete(name=file3.name)
 ```
@@ -666,32 +666,32 @@ client.files.delete(name=file3.name)
 ```python
 if client.vertexai:
     file_uris = [
-        "gs://cloud-samples-data/generative-ai/pdf/2312.11805v3.pdf",
-        "gs://cloud-samples-data/generative-ai/pdf/2403.05530.pdf",
+        'gs://cloud-samples-data/generative-ai/pdf/2312.11805v3.pdf',
+        'gs://cloud-samples-data/generative-ai/pdf/2403.05530.pdf',
     ]
 else:
     file_uris = [file1.uri, file2.uri]
 
 cached_content = client.caches.create(
-    model="gemini-1.5-pro-002",
+    model='gemini-1.5-pro-002',
     config=types.CreateCachedContentConfig(
         contents=[
             types.Content(
-                role="user",
+                role='user',
                 parts=[
                     types.Part.from_uri(
-                        file_uri=file_uris[0], mime_type="application/pdf"
+                        file_uri=file_uris[0], mime_type='application/pdf'
                     ),
                     types.Part.from_uri(
                         file_uri=file_uris[1],
-                        mime_type="application/pdf",
+                        mime_type='application/pdf',
                     ),
                 ],
             )
         ],
-        system_instruction="What is the sum of the two pdfs?",
-        display_name="test cache",
-        ttl="3600s",
+        system_instruction='What is the sum of the two pdfs?',
+        display_name='test cache',
+        ttl='3600s',
     ),
 )
 ```
@@ -706,8 +706,8 @@ cached_content = client.caches.get(name=cached_content.name)
 
 ```python
 response = client.models.generate_content(
-    model="gemini-1.5-pro-002",
-    contents="Summarize the pdfs",
+    model='gemini-1.5-pro-002',
+    contents='Summarize the pdfs',
     config=types.GenerateContentConfig(
         cached_content=cached_content.name,
     ),
@@ -727,17 +727,17 @@ tuning through `tune`.
 
 ```python
 if client.vertexai:
-    model = "gemini-1.5-pro-002"
+    model = 'gemini-1.5-pro-002'
     training_dataset = types.TuningDataset(
-        gcs_uri="gs://cloud-samples-data/ai-platform/generative_ai/gemini-1_5/text/sft_train_data.jsonl",
+        gcs_uri='gs://cloud-samples-data/ai-platform/generative_ai/gemini-1_5/text/sft_train_data.jsonl',
     )
 else:
-    model = "models/gemini-1.0-pro-001"
+    model = 'models/gemini-1.0-pro-001'
     training_dataset = types.TuningDataset(
         examples=[
             types.TuningExample(
-                text_input=f"Input text {i}",
-                output=f"Output text {i}",
+                text_input=f'Input text {i}',
+                output=f'Output text {i}',
             )
             for i in range(5)
         ],
@@ -749,7 +749,7 @@ tuning_job = client.tunings.tune(
     base_model=model,
     training_dataset=training_dataset,
     config=types.CreateTuningJobConfig(
-        epoch_count=1, tuned_model_display_name="test_dataset_examples model"
+        epoch_count=1, tuned_model_display_name='test_dataset_examples model'
     ),
 )
 print(tuning_job)
@@ -767,8 +767,8 @@ import time
 
 running_states = set(
     [
-        "JOB_STATE_PENDING",
-        "JOB_STATE_RUNNING",
+        'JOB_STATE_PENDING',
+        'JOB_STATE_RUNNING',
     ]
 )
 
@@ -783,7 +783,7 @@ while tuning_job.state in running_states:
 ```python
 response = client.models.generate_content(
     model=tuning_job.tuned_model.endpoint,
-    contents="why is the sky blue?",
+    contents='why is the sky blue?',
 )
 
 print(response.text)
@@ -801,12 +801,12 @@ print(tuned_model)
 To retrieve base models, see [list base models](#list-base-models).
 
 ```python
-for model in client.models.list(config={"page_size": 10, "query_base": False}):
+for model in client.models.list(config={'page_size': 10, 'query_base': False}):
     print(model)
 ```
 
 ```python
-pager = client.models.list(config={"page_size": 10, "query_base": False})
+pager = client.models.list(config={'page_size': 10, 'query_base': False})
 print(pager.page_size)
 print(pager[0])
 pager.next_page()
@@ -816,12 +816,12 @@ print(pager[0])
 #### Async
 
 ```python
-async for job in await client.aio.models.list(config={"page_size": 10, "query_base": False}):
+async for job in await client.aio.models.list(config={'page_size': 10, 'query_base': False}):
     print(job)
 ```
 
 ```python
-async_pager = await client.aio.models.list(config={"page_size": 10, "query_base": False})
+async_pager = await client.aio.models.list(config={'page_size': 10, 'query_base': False})
 print(async_pager.page_size)
 print(async_pager[0])
 await async_pager.next_page()
@@ -836,7 +836,7 @@ model = pager[0]
 model = client.models.update(
     model=model.name,
     config=types.UpdateModelConfig(
-        display_name="my tuned model", description="my tuned model description"
+        display_name='my tuned model', description='my tuned model description'
     ),
 )
 
@@ -847,12 +847,12 @@ print(model)
 ### List Tuning Jobs
 
 ```python
-for job in client.tunings.list(config={"page_size": 10}):
+for job in client.tunings.list(config={'page_size': 10}):
     print(job)
 ```
 
 ```python
-pager = client.tunings.list(config={"page_size": 10})
+pager = client.tunings.list(config={'page_size': 10})
 print(pager.page_size)
 print(pager[0])
 pager.next_page()
@@ -862,12 +862,12 @@ print(pager[0])
 #### Async
 
 ```python
-async for job in await client.aio.tunings.list(config={"page_size": 10}):
+async for job in await client.aio.tunings.list(config={'page_size': 10}):
     print(job)
 ```
 
 ```python
-async_pager = await client.aio.tunings.list(config={"page_size": 10})
+async_pager = await client.aio.tunings.list(config={'page_size': 10})
 print(async_pager.page_size)
 print(async_pager[0])
 await async_pager.next_page()
@@ -883,8 +883,8 @@ Only supported in Vertex AI.
 ```python
 # Specify model and source file only, destination and job display name will be auto-populated
 job = client.batches.create(
-    model="gemini-1.5-flash-002",
-    src="bq://my-project.my-dataset.my-table",
+    model='gemini-1.5-flash-002',
+    src='bq://my-project.my-dataset.my-table',
 )
 
 job
@@ -900,10 +900,10 @@ job.state
 ```python
 completed_states = set(
     [
-        "JOB_STATE_SUCCEEDED",
-        "JOB_STATE_FAILED",
-        "JOB_STATE_CANCELLED",
-        "JOB_STATE_PAUSED",
+        'JOB_STATE_SUCCEEDED',
+        'JOB_STATE_FAILED',
+        'JOB_STATE_CANCELLED',
+        'JOB_STATE_PAUSED',
     ]
 )
 
